@@ -1,6 +1,6 @@
 # Cloudflare Developer Skill
 
-Comprehensive skill for building applications on the Cloudflare Developer Platform.
+Comprehensive skill for building applications on the Cloudflare Developer Platform. This is an unofficial tool.
 
 ## What This Skill Does
 
