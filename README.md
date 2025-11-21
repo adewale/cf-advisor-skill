@@ -62,6 +62,21 @@
 - Use **Option 1** if you work on Cloudflare projects frequently
 - Use **Option 2** if you want the skill versioned with your project
 
+### Option 3: Use with Normal Claude (Web/Mobile)
+
+**Per-conversation:**
+1. Download or clone this repository
+2. In Claude, drag and drop `SKILL.md` into the chat
+3. Claude will activate the skill for that conversation
+
+**In Projects:**
+1. Open your Claude Project settings
+2. Click "Add skill" → "Upload skill file"
+3. Upload `SKILL.md`
+4. Skill available in all project chats
+
+**Note:** Normal Claude can't auto-load reference files. For complex questions, manually upload relevant files from `references/` folder.
+
 ---
 
 ## Quick Start
