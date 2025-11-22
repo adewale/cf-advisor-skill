@@ -64,18 +64,14 @@
 
 ### Option 3: Use with Normal Claude (Web/Mobile)
 
-**Per-conversation:**
 1. Download or clone this repository
-2. In Claude, drag and drop `SKILL.md` into the chat
-3. Claude will activate the skill for that conversation
+2. Create a zip file containing `SKILL.md` and the `references/` folder:
+   ```bash
+   zip -r cloudflare-skill.zip SKILL.md references/
+   ```
+3. Upload `cloudflare-skill.zip` to your Claude conversation or Project
 
-**In Projects:**
-1. Open your Claude Project settings
-2. Click "Add skill" → "Upload skill file"
-3. Upload `SKILL.md`
-4. Skill available in all project chats
-
-**Note:** Normal Claude can't auto-load reference files. For complex questions, manually upload relevant files from `references/` folder.
+Claude will extract and use all files automatically.
 
 ---
 
