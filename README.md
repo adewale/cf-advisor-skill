@@ -62,6 +62,17 @@
 - Use **Option 1** if you work on Cloudflare projects frequently
 - Use **Option 2** if you want the skill versioned with your project
 
+### Option 3: Use with Normal Claude (Web/Mobile)
+
+1. Download or clone this repository
+2. Create a zip file containing `SKILL.md` and the `references/` folder:
+   ```bash
+   zip -r cloudflare-skill.zip SKILL.md references/
+   ```
+3. Upload `cloudflare-skill.zip` to your Claude conversation or Project
+
+Claude will extract and use all files automatically.
+
 ---
 
 ## Quick Start
