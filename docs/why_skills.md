@@ -44,7 +44,7 @@ Each Skill must contain a `SKILL.md` file with YAML frontmatter:
 
 ```yaml
 ---
-name: cloudflare
+name: cloudflare-advisor
 description: Comprehensive guide for Cloudflare development covering Workers, Pages, D1, KV, Durable Objects, R2, Hyperdrive, AI Gateway, Browser Rendering, Agents, and all other Cloudflare developer platform services. Use when the user needs help with Cloudflare products.
 ---
 
@@ -137,7 +137,7 @@ Skills execute **within the main Claude Code conversation context**:
 
 **This Cloudflare Skill structure:**
 ```
-.claude/skills/cloudflare/
+.claude/skills/cloudflare-advisor/
 ├── SKILL.md                          # 495 lines
 └── references/
     ├── primitives-catalog.md         # 1,115 lines
@@ -292,7 +292,7 @@ Context remaining:   130,000-158,000 tokens (65-79%)
    - ~2 hours per new product
 
 5. **Team Collaboration**
-   - Commit `.claude/skills/cloudflare/` to repo
+   - Commit `.claude/skills/cloudflare-advisor/` to repo
    - Everyone gets Cloudflare expertise automatically
    - No individual configuration
    - Knowledge travels with codebase
@@ -527,7 +527,7 @@ Add an MCP server for Cloudflare when users need:
 
 **Version control:**
 ```bash
-git add .claude/skills/cloudflare/
+git add .claude/skills/cloudflare-advisor/
 git commit -m "Add Workflows product"
 git push
 

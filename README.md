@@ -1,4 +1,4 @@
-# Cloudflare Developer Skill
+# Cloudflare Advisor
 
 **Comprehensive Cloudflare Developer Platform knowledge for Claude Code**
 
@@ -24,16 +24,16 @@
    ```bash
    cd ~/.claude/skills
    # Option A: Clone from git
-   git clone https://github.com/adewale/cf-advisor-skill cloudflare
+   git clone https://github.com/adewale/cf-advisor-skill cloudflare-advisor
 
    # Option B: Copy existing directory
-   cp -r /path/to/cf-advisor-skill cloudflare
+   cp -r /path/to/cf-advisor-skill cloudflare-advisor
    ```
 
 3. **Verify structure:**
    ```bash
-   ls ~/.claude/skills/cloudflare/SKILL.md
-   # Should show: /Users/<you>/.claude/skills/cloudflare/SKILL.md
+   ls ~/.claude/skills/cloudflare-advisor/SKILL.md
+   # Should show: /Users/<you>/.claude/skills/cloudflare-advisor/SKILL.md
    ```
 
 4. **Restart Claude Code** (if running)
@@ -46,13 +46,13 @@
    cd .claude/skills
 
    # Clone or copy the skill here
-   git clone https://github.com/adewale/cf-advisor-skill cloudflare
+   git clone https://github.com/adewale/cf-advisor-skill cloudflare-advisor
    ```
 
 2. **Commit to version control** (team members get it automatically):
    ```bash
-   git add .claude/skills/cloudflare
-   git commit -m "Add Cloudflare Developer Skill"
+   git add .claude/skills/cloudflare-advisor
+   git commit -m "Add Cloudflare Advisor skill"
    git push
    ```
 
@@ -424,10 +424,10 @@ Keep SKILL.md focused on core concepts (<500 lines). Details go in reference fil
 **Check installation path:**
 ```bash
 # Personal installation
-ls ~/.claude/skills/cloudflare/SKILL.md
+ls ~/.claude/skills/cloudflare-advisor/SKILL.md
 
 # Project installation
-ls .claude/skills/cloudflare/SKILL.md
+ls .claude/skills/cloudflare-advisor/SKILL.md
 ```
 
 **Both should show the SKILL.md file path.**
@@ -447,12 +447,12 @@ ls .claude/skills/cloudflare/SKILL.md
 **Check skill version:**
 ```bash
 # Check last updated date
-grep "Last Updated" ~/.claude/skills/cloudflare/README.md
+grep "Last Updated" ~/.claude/skills/cloudflare-advisor/README.md
 ```
 
 **If outdated:**
 ```bash
-cd ~/.claude/skills/cloudflare
+cd ~/.claude/skills/cloudflare-advisor
 git pull  # If installed via git
 # or re-copy the updated skill
 ```

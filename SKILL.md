@@ -1,5 +1,5 @@
 ---
-name: cloudflare
+name: cloudflare-advisor
 description: Comprehensive guide for Cloudflare development covering Workers, Pages, D1, KV, Durable Objects, R2, Hyperdrive, AI Gateway, Browser Rendering, Agents, and all other Cloudflare developer platform services. Use when the user needs help with Cloudflare products including deployment, configuration, API usage, choosing the right primitives, composing solutions, migrating from traditional servers, or understanding how Cloudflare products work together. Covers mental models for edge computing, solution architecture patterns, and best practices.
 ---
 
