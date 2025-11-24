@@ -815,6 +815,320 @@ export default {
 
 ---
 
+---
+
+## Web Crypto API
+
+### Overview
+
+**Source**: https://developers.cloudflare.com/workers/runtime-apis/web-crypto/
+
+Use Web Crypto API for all cryptographic operations. **Never implement custom crypto**.
+
+### Hashing & Digesting
+
+**Supported algorithms**: SHA-1, SHA-256, SHA-384, SHA-512, MD5 (legacy only)
+
+```typescript
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+  // Convert to hex string
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  return hashHex;
+}
+```
+
+### HMAC Request Signing
+
+```typescript
+interface Env {
+  SIGNING_SECRET: string;
+}
+
+async function signRequest(data: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+
+  // Import secret key
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  // Sign data
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode(data)
+  );
+
+  // Convert to hex
+  return Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function verifyRequest(
+  data: string,
+  signature: string,
+  secret: string
+): Promise<boolean> {
+  const encoder = new TextEncoder();
+
+  // Import secret key
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify']
+  );
+
+  // Convert hex signature to Uint8Array
+  const signatureBytes = new Uint8Array(
+    signature.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+  );
+
+  // Verify (timing-safe)
+  return await crypto.subtle.verify(
+    'HMAC',
+    key,
+    signatureBytes,
+    encoder.encode(data)
+  );
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const receivedSignature = request.headers.get('X-Signature');
+    const body = await request.text();
+
+    if (!receivedSignature) {
+      return new Response('Missing signature', { status: 401 });
+    }
+
+    // ✅ Use crypto.subtle.verify() - timing-safe
+    const isValid = await verifyRequest(body, receivedSignature, env.SIGNING_SECRET);
+
+    if (!isValid) {
+      return new Response('Invalid signature', { status: 403 });
+    }
+
+    return new Response('OK');
+  }
+};
+```
+
+**Security Best Practice**: Use `crypto.subtle.verify()` instead of string comparison to prevent timing attacks.
+
+### Timing-Safe Comparison
+
+```typescript
+async function timingSafeEqual(a: string, b: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const bufferA = encoder.encode(a);
+  const bufferB = encoder.encode(b);
+
+  if (bufferA.length !== bufferB.length) {
+    return false;
+  }
+
+  // Constant-time comparison
+  return crypto.subtle.timingSafeEqual(bufferA, bufferB);
+}
+```
+
+### Encryption & Decryption
+
+**Symmetric encryption (AES-GCM)**:
+
+```typescript
+async function encryptData(data: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+
+  // Generate random IV
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+
+  // Import key
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret.padEnd(32, '0').slice(0, 32)),
+    'AES-GCM',
+    false,
+    ['encrypt']
+  );
+
+  // Encrypt
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    keyMaterial,
+    encoder.encode(data)
+  );
+
+  // Combine IV + encrypted data
+  const combined = new Uint8Array(iv.length + encrypted.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(encrypted), iv.length);
+
+  // Return as base64
+  return btoa(String.fromCharCode(...combined));
+}
+
+async function decryptData(encrypted: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  // Decode base64
+  const combined = Uint8Array.from(atob(encrypted), c => c.charCodeAt(0));
+
+  // Extract IV and encrypted data
+  const iv = combined.slice(0, 12);
+  const data = combined.slice(12);
+
+  // Import key
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret.padEnd(32, '0').slice(0, 32)),
+    'AES-GCM',
+    false,
+    ['decrypt']
+  );
+
+  // Decrypt
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    keyMaterial,
+    data
+  );
+
+  return decoder.decode(decrypted);
+}
+```
+
+### Secure Random Values
+
+```typescript
+// Generate cryptographically secure random values
+const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+
+// Generate UUID (RFC 4122 v4)
+const uuid = crypto.randomUUID(); // e.g., '123e4567-e89b-12d3-a456-426614174000'
+```
+
+---
+
+## CORS Best Practices
+
+### Origin-Specific CORS
+
+**Source**: https://developers.cloudflare.com/workers/examples/cors-header-proxy/
+
+```typescript
+function handleCORS(request: Request, response: Response): Response {
+  const origin = request.headers.get('Origin');
+
+  // Whitelist of allowed origins
+  const allowedOrigins = [
+    'https://example.com',
+    'https://app.example.com',
+    'https://staging.example.com'
+  ];
+
+  if (origin && allowedOrigins.includes(origin)) {
+    const headers = new Headers(response.headers);
+
+    // ✅ Set origin-specific (not wildcard)
+    headers.set('Access-Control-Allow-Origin', origin);
+
+    // ✅ Include Vary header to prevent incorrect caching
+    headers.append('Vary', 'Origin');
+
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key');
+    headers.set('Access-Control-Allow-Credentials', 'true');
+    headers.set('Access-Control-Max-Age', '86400'); // 24 hours
+
+    return new Response(response.body, {
+      status: response.status,
+      headers
+    });
+  }
+
+  // Origin not allowed
+  return response;
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // Handle preflight request
+    if (request.method === 'OPTIONS') {
+      return handlePreflight(request);
+    }
+
+    const response = await handleRequest(request, env);
+
+    // Add CORS headers to response
+    return handleCORS(request, response);
+  }
+};
+
+function handlePreflight(request: Request): Response {
+  const origin = request.headers.get('Origin');
+  const method = request.headers.get('Access-Control-Request-Method');
+  const headers = request.headers.get('Access-Control-Request-Headers');
+
+  // Detect preflight request
+  if (origin && method && headers) {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': method,
+        'Access-Control-Allow-Headers': headers,
+        'Access-Control-Max-Age': '86400',
+        'Vary': 'Origin'
+      }
+    });
+  }
+
+  return new Response('Invalid preflight request', { status: 400 });
+}
+```
+
+**Security Considerations**:
+- Use origin-specific responses, not wildcards (`*`) when using credentials
+- Include `Vary: Origin` header to prevent cache poisoning
+- Return request's `Access-Control-Request-Headers` in preflight response
+- Validate origin against whitelist
+
+---
+
+## TLS Validation
+
+```typescript
+export default {
+  async fetch(request: Request): Promise<Response> {
+    // Validate TLS version 1.2 or higher
+    const tlsVersion = request.cf?.tlsVersion;
+
+    if (tlsVersion && !['TLSv1.2', 'TLSv1.3'].includes(tlsVersion)) {
+      return new Response('TLS 1.2+ required', { status: 403 });
+    }
+
+    return new Response('OK');
+  }
+};
+```
+
+---
+
 ## Summary
 
 ### Security Layer Checklist
@@ -828,25 +1142,42 @@ For production applications, implement:
 5. ✅ **Input Validation** - Sanitize all inputs
 6. ✅ **Security Headers** - Browser-level protection
 7. ✅ **Authentication** - JWT or API keys
-8. ✅ **Request Signing** - Prevent tampering
-9. ✅ **HTTPS Only** - Enforce TLS
-10. ✅ **Logging** - Monitor security events
+8. ✅ **Request Signing** - HMAC with Web Crypto API
+9. ✅ **HTTPS Only** - Enforce TLS 1.2+
+10. ✅ **CORS** - Origin-specific with Vary header
+11. ✅ **Web Crypto API** - Use for all cryptographic operations
+12. ✅ **Timing-Safe Comparisons** - Prevent timing attacks
+13. ✅ **Logging** - Monitor security events
 
 ### Defense in Depth
 
 Combine multiple security layers:
 ```
-WAF → Rate Limiting → Turnstile → Input Validation → Business Logic
+WAF → Rate Limiting → Turnstile → Input Validation → Web Crypto → Business Logic
 ```
 
 Each layer provides redundancy if another fails.
+
+### Critical Security Principles
+
+1. **Never implement custom crypto** - Use Web Crypto API
+2. **Use timing-safe comparison** - `crypto.subtle.verify()` or `timingSafeEqual()`
+3. **Origin-specific CORS** - No wildcards with credentials
+4. **Parameterized queries** - Prevent SQL injection
+5. **Encrypted secrets** - Never plaintext environment variables
+6. **TLS 1.2+ only** - Validate TLS version
+7. **Security headers** - CSP, HSTS, X-Frame-Options, etc.
 
 ---
 
 ## See Also
 
-- **Integration Details**: `workers-integrations.md` for binding configuration
-- **Best Practices**: `workers-best-practices.md` for code standards
-- **Examples**: `workers-examples.md` for complete implementations
-- **Official Docs**: https://developers.cloudflare.com/waf/
-- **Turnstile Docs**: https://developers.cloudflare.com/turnstile/
+- **Deployment**: `deployment-workflows.md` - Secrets management, environments
+- **Integration Details**: `workers-integrations.md` - Binding configuration
+- **Best Practices**: `workers-best-practices.md` - Code standards
+- **Examples**: `workers-examples.md` - Complete implementations
+- **Official Docs**:
+  - WAF: https://developers.cloudflare.com/waf/
+  - Turnstile: https://developers.cloudflare.com/turnstile/
+  - Web Crypto: https://developers.cloudflare.com/workers/runtime-apis/web-crypto/
+  - Security Headers: https://developers.cloudflare.com/workers/examples/security-headers/

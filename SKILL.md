@@ -1,6 +1,6 @@
 ---
 name: cloudflare-advisor
-description: Comprehensive guide for Cloudflare development covering Workers, Pages, D1, KV, Durable Objects, R2, Hyperdrive, AI Gateway, Browser Rendering, Agents, and all other Cloudflare developer platform services. Use when the user needs help with Cloudflare products including deployment, configuration, API usage, choosing the right primitives, composing solutions, migrating from traditional servers, or understanding how Cloudflare products work together. Covers mental models for edge computing, solution architecture patterns, and best practices.
+description: Complete Cloudflare developer guide for Workers, Pages, D1, KV, Durable Objects, R2, Hyperdrive, AI Gateway, WebSockets, Agents, and all platform services. Use when building or architecting Cloudflare applications, migrating from servers/Express/Node.js, choosing between storage options (KV vs D1 vs R2), implementing real-time features, designing solution patterns, understanding edge computing paradigms, deploying Workers code, or troubleshooting Cloudflare services. Includes mental models for thinking in primitives, composition patterns for multi-service solutions, production code examples, and best practices for serverless edge applications.
 ---
 
 # Cloudflare Developer Skill
@@ -321,6 +321,11 @@ To add a new product to this skill:
 - **Complete working examples** → Read `references/workers-examples.md`
 - **WebSocket or Agent implementation** → Read `references/workers-websockets-agents.md`
 
+### Production & Operations
+- **Deployment workflows** → Read `references/deployment-workflows.md`
+- **Security patterns** → Read `references/security-patterns.md`
+- **Migration procedures** → Read `references/migration-guides.md`
+
 ## Decision Tree: Loading the Right Context
 
 Use this decision tree to determine which reference files to load based on the user's request:
@@ -408,6 +413,74 @@ If you need a complete example pattern:
 - For architecture: Also read `references/composition-patterns.md`
 ```
 
+### 10. User asks about environments, testing, deployment, or CI/CD
+**Load:** Deployment workflows
+```
+- Read `references/deployment-workflows.md`
+```
+
+Topics covered:
+- Environment management (dev/staging/production)
+- Secrets management (Wrangler secrets, .dev.vars)
+- Testing strategies (Vitest integration)
+- Gradual deployments and traffic splitting
+- Rollback procedures
+- Observability and monitoring
+- Error handling patterns
+- Cost optimization
+- Platform limits
+
+### 11. User asks about Web Crypto, CORS, encryption, or authentication
+**Load:** Security patterns with crypto focus
+```
+- Read `references/security-patterns.md`
+```
+
+Topics covered:
+- Web Crypto API (hashing, HMAC, encryption)
+- Timing-safe comparisons
+- CORS best practices
+- TLS validation
+- WAF integration
+- Turnstile bot protection
+- Rate limiting (KV, Durable Objects, token bucket)
+- JWT validation
+- Request signing
+
+### 12. User asks about D1 import/export, database migration, or R2 migration
+**Load:** Migration guides with database focus
+```
+- Read `references/migration-guides.md`
+```
+
+Topics covered:
+- D1 migration process (PostgreSQL/MySQL → SQLite)
+- D1 import/export procedures
+- D1 horizontal scaling (sharding)
+- Hyperdrive setup for existing databases
+- R2 migration from S3
+- Traffic migration strategies
+- Zero-downtime deployments
+- Rollback procedures
+
+### 13. User asks about getting started, project setup, or development workflow
+**Load:** Development lifecycle guide
+```
+- Read `references/development-lifecycle.md`
+```
+
+Topics covered:
+- Project initialization and setup
+- Local development workflow
+- Creating resources (D1, KV, R2, Queues)
+- Database migrations
+- Testing with Vitest
+- Deployment workflows (solo, team, enterprise)
+- Production operations (monitoring, incidents, maintenance)
+- CI/CD integration
+- Command reference by phase
+- Decision matrix for workflow choices
+
 ## Code Generation Workflow
 
 When generating Cloudflare Workers code, follow this workflow:
@@ -455,10 +528,28 @@ When generating Cloudflare Workers code, follow this workflow:
 |-------------------------|------------------|
 | "how does X work", "what is Y" | `primitives-catalog.md`, `composition-patterns.md` |
 | "migrate from", "move from" | `migration-guides.md`, `composition-patterns.md` |
+| "D1 import", "database migration", "PostgreSQL to D1" | `migration-guides.md` (Database Migration) |
+| "R2 migration", "S3 to R2" | `migration-guides.md` (R2 Migration) |
 | "build", "create", "implement" | `workers-best-practices.md`, `workers-integrations.md` |
 | "WebSocket", "real-time", "chat" | `workers-websockets-agents.md` |
 | "Agent", "AI agent", "state management" | `workers-websockets-agents.md` |
 | "security", "WAF", "Turnstile", "rate limit" | `security-patterns.md` |
+| "Web Crypto", "HMAC", "encryption", "CORS" | `security-patterns.md` (Web Crypto & CORS) |
+| "authentication", "JWT", "signing" | `security-patterns.md` (API Security) |
+| "environments", "staging", "production", "dev" | `deployment-workflows.md` (Environment Management) |
+| "secrets", "environment variables", ".dev.vars" | `deployment-workflows.md` (Secrets Management) |
+| "testing", "Vitest", "unit tests" | `deployment-workflows.md` (Testing Strategies) |
+| "deployment", "gradual rollout", "traffic split" | `deployment-workflows.md` (Deployment Strategies) |
+| "rollback", "versions", "downtime" | `deployment-workflows.md` (Rollback Procedures) |
+| "monitoring", "logging", "observability" | `deployment-workflows.md` (Observability) |
+| "errors", "error handling", "exceptions" | `deployment-workflows.md` (Error Handling) |
+| "cost", "pricing", "optimization" | `deployment-workflows.md` (Cost Optimization) |
+| "limits", "CPU time", "memory", "timeouts" | `deployment-workflows.md` (Platform Limits) |
+| "getting started", "quickstart", "tutorial" | `development-lifecycle.md` |
+| "project setup", "wrangler init", "create project" | `development-lifecycle.md` (Project Initialization) |
+| "local development", "wrangler dev", "hot reload" | `development-lifecycle.md` (Development Phase) |
+| "workflow", "process", "best workflow" | `development-lifecycle.md` (Workflows by Team Size) |
+| "CI/CD", "GitHub Actions", "GitLab CI" | `development-lifecycle.md` (CI/CD Integration) |
 | "Service Binding", "microservices", "Smart Placement" | `workers-integrations.md` (Platform Features) |
 | "wrangler", "CLI", "deploy", "commands" | `wrangler-commands.md` |
 | "KV", "D1", "R2", "Queue", specific service | `workers-integrations.md` |

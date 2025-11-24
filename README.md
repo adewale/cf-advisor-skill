@@ -178,6 +178,28 @@ Claude Code automatically activates this skill when you ask about:
 - WebSocket and real-time patterns
 - Security and best practices
 
+### How to Trigger This Skill Reliably
+
+The skill activates automatically when you mention Cloudflare products or development tasks. For best results:
+
+**Questions That Always Work:**
+- "How do I build a Worker that uses D1?"
+- "Migrate my Express server to Cloudflare Workers"
+- "Design a real-time chat app with Durable Objects"
+- "Should I use KV or D1 for user sessions?"
+- "Show me a full-stack app architecture on Cloudflare"
+
+**Make Your Question Better:**
+
+| Instead of this... | Say this... |
+|-------------------|-------------|
+| "Build me a serverless function" | "Build a Cloudflare Worker that..." |
+| "How do I store files?" | "How do I use R2 to store files?" |
+| "Tell me about Cloudflare" | "Explain Cloudflare Workers and when to use them" |
+| "Migrate my app" | "Migrate my Express.js app to Cloudflare Workers" |
+
+**Pro Tip:** Include product names (Workers, D1, KV, R2, Durable Objects, Pages) and specific actions (build, deploy, migrate, architecture).
+
 ---
 
 ## How It Works
