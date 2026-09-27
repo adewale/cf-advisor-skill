@@ -1,5 +1,12 @@
 # Cloudflare Advisor
 
+> [!WARNING]
+> **Unmaintained — superseded by [Cloudflare Doctor (`cfdoctor`)](https://github.com/adewale/cfdoctor).**
+> This skill has not been updated since November 2025 and has no tests, evals or link checks. Cloudflare's
+> products, limits and pricing have changed since then, so treat the guidance below as a historical snapshot.
+> For current Cloudflare guidance use [cfdoctor](https://github.com/adewale/cfdoctor), which refreshes product
+> facts from the official docs and is covered by an eval harness.
+
 **Comprehensive Cloudflare Developer Platform knowledge for Claude Code**
 
 - 27 products, 100% llms.txt coverage
